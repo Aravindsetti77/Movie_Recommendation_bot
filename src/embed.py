@@ -5,7 +5,9 @@ from chromadb.utils import embedding_functions
 from sentence_transformers import SentenceTransformer
 client=chromadb.PersistentClient(path="./movie_db")
 model="all-MiniLM-L6-V2"
-emb_fn=embedding_functions.SentenceTransformerEmbeddingFunction(model_name=model)
+emb_fn=embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name=model,
+    device="cuda")
 collection=client.get_or_create_collection(name="TMDB",embedding_function=emb_fn,metadata={"hnsw:space": "cosine"})
 df=pd.read_csv("Data/TMDB_clear_data.csv")
 batch_size=512
