@@ -7,7 +7,6 @@ class DBManager:
     _client=None
     def __init__(self, path="./movie_db"):
         self._client = chromadb.PersistentClient(path=path)
-    def embed_function(self):
         self.emb_fn=SentenceTransformerEmbeddingFunction(model_name="multi-qa-mpnet-base-dot-v1",
                                                          device="cuda" if torch.cuda.is_available() else "cpu")
     def create_collection(self,name):
