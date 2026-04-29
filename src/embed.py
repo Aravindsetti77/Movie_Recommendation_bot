@@ -5,28 +5,31 @@ import torch
 from chromadb.utils import embedding_functions
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from sentence_transformers import SentenceTransformer
+from db_manager import DBManager
 class Embeddings:
-    def __init__(self,client):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = SentenceTransformer('All-MiniLM-L6-v2', device=self.device)
-        self.emb_fn=SentenceTransformerEmbeddingFunction(model_name="all_MiniLM-L6-V2",device="cuda")
-        self.collectioncollection=client.get_or_create_collection(name="TMDB",embedding_function=self.emb_fn,metadata={"hnsw:space": "cosine"})
-        self.df=pd.read_csv("Data/TMDB_clear_data.csv")
-    def create_embeddings(self):
-        batch_size=512
-        rows=len(self.df)
-        for i in range(0,rows,batch_size):
-            batch_df=self.df.iloc[i:i+batch_size]
-            self.collection.add(
+    def __init__(self):
+        self.db = DBManager()
+        self.collection = self.db.get_collection("TMDB")
+    def create_embeddings(self, csv_path="Data/TMDB_clear_data.csv"):
+        df = pd.read_csv(csv_path)
+        df['id'] = df['id'].astype(str)
+        df['dna'] = df['dna'].fillna("")
+        batch_size = 512
+        rows = len(df)
+        for i in range(0, rows, batch_size):
+            batch_df = df.iloc[i:i+batch_size]
+            
+            self.collection.upsert(
                 documents=batch_df['dna'].tolist(),
-                metadatas=[{"title": row['title'], "genres": row['genres_list']} for _, row in batch_df.iterrows()],
-                ids=batch_df['id'].astype(str).tolist()
+                metadatas=[
+                    {
+                        "title": row['title'], 
+                        "genres": str(row['genres_list']) # Chroma prefers simple types in metadata
+                    } for _, row in batch_df.iterrows()
+                ],
+                ids=batch_df['id'].tolist()
             )
-            if i%512==0:
-                print(f"processed{i}/{rows}")
-    def verify_embedding(self,id):
-        result=self.collection.get(
-            ids=[str(id)],
-            include=["embeddings", "metadatas", "documents"]
-        )
-        print(result['embeddings'][0])
+            print(f"Processed {min(i + batch_size, rows)}/{rows}")
+if __name__=="__main__":
+    embedder=Embeddings()
+    embedder.create_embeddings()
