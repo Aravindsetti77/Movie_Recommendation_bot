@@ -13,7 +13,7 @@ class DBManager:
         )
     def get_collection(self,name):
         return self._client.get_or_create_collection(
-            name=name, 
+            name=name,
             embedding_function=self.emb_fn,
             metadata={"hnsw:space": "cosine"}
         )

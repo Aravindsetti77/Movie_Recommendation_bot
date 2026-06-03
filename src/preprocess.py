@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 df=pd.read_csv("Data/Merge.csv")
-# Vectorized operations for better performance with natural language structure
+
 df["dna"] = (
     "Title: " + df["original_title"].astype(str) + ". " +
     "Genres: " + df["genres"].astype(str) + ". " +
