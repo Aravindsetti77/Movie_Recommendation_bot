@@ -1,0 +1,7 @@
+*.csv
+*.pt
+movie_db/
+movies/
+.env
+__pycache__/
+*.pyc
