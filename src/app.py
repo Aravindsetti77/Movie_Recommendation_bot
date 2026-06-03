@@ -3,14 +3,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from pydantic import BaseModel
-from dotenv import load_dotenv
 import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from search import Recommender
 
-load_dotenv(override=True)
-TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+
 
 app = FastAPI(title="Movie Recommender")
 

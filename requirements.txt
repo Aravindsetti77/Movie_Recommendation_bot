@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+chromadb
+torch
+sentence-transformers
+pandas
+numpy
